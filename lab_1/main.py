@@ -41,6 +41,13 @@ def methodSecuschih(x0 , x1):
             x0 = x1
             x1 = x2
 
+
+def show(x,it,f_x):
+    print(f'корень уравнения: {x}')
+    print(f'число итераций: {it}')
+    print(f"невязка: {abs(f_x)}")
+    
+
 x = np.linspace(-4,0.5,1000)
 
 plt.figure()
@@ -48,20 +55,21 @@ plt.plot(x,f(x),label='$f(x) = x^3 + 4.7x^2 + 4.1x + 0.5$',color='black')
 plt.grid()
 plt.show()
 
-a = float(input("Введите левый конец отрезка a: "))
-b = float(input("Введите правый конец отрезка b: "))
-choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
+while 1:
+    a = float(input("Введите левый конец отрезка a: "))
+    b = float(input("Введите правый конец отрезка b: "))
+    choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
 
-match choice:
-    case 1:
-        print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
-        c,it,f_c = methodPolovinnogoDeleniya(a , b)
-        print(f'корни уравнения по методам: {c}')
-        print(f'число итераций: {it}')
-        print(f'значения в точке f(c): {f_c}')
-    case 2:
-        print('\nМЕТОД СЕКУЩИХ')
-        c1,it1,f_c1 = methodSecuschih(a , b)
-        print(f'корни уравнения по методам: {c1}')
-        print(f'число итераций: {it1}')
-        print(f'значения в точке f(c): {f_c1}')
+    match choice:
+        case 1:
+            print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
+            c,it,f_c = methodPolovinnogoDeleniya(a , b)
+            show(c,it,f_c)
+        case 2:
+            print('\nМЕТОД СЕКУЩИХ')
+            c1,it1,f_c1 = methodSecuschih(a , b)
+            show(c1,it1,f_c1)
+            
+    c = input('\nПродолжить? Введите Y или y, чтобы подтвердить , иначе - нет: ')
+    if(c != 'Y' and c != 'y'):
+        break
