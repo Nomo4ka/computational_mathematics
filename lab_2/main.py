@@ -12,6 +12,4 @@ def f(x):
 def g(x):
     return np.acos(0.7-2*x)+1
 
-arr = [[1,2],[2]]
-print(arr)
 
