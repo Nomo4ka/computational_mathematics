@@ -11,14 +11,11 @@ def f(x):
 
 def methodPolovinnogoDeleniya(a , b):
     f_a = f(a)
-    for it in range(1000):
-        if b - a < 2 * EPS:
-            c = 0.5*(a + b)
-            f_c = f(c)
-            return c,it,f_c
-        
-        c = 0.5*(a+b)
-        f_c = f(c) 
+    it = 0
+    while abs(b - a) >=  2 * EPS:
+        c = 0.5*(a + b)
+        f_c = f(c)
+        it += 1
         
         if abs(f_c) < EPS:
             return c,it,f_c
@@ -29,17 +26,27 @@ def methodPolovinnogoDeleniya(a , b):
             a = c
             f_a = f_c 
 
+    c = 0.5*(a + b)
+    f_c = f(c)
+    return c, it, f_c
+
 def methodSecuschih(x0 , x1):
-    for it in range(1000):
-        f_x0 = f(x0)
-        f_x1 = f(x1)
+    f_x0 = f(x0)
+    f_x1 = f(x1)
+    it = 0
+        
+    while abs(x1 - x0) > EPS and abs(f_x1) > EPS:
 
         x2 = x1 - f_x1*(x1 - x0)/(f_x1 - f_x0)
-        if abs(x2-x1)<EPS or abs(f(x2)) < EPS:
-            return x2,it,f(x2)
-        else:
-            x0 = x1
-            x1 = x2
+        f_x2 = f(x2)
+        it+=1
+            
+        x0 = x1
+        x1 = x2
+        f_x0 = f_x1
+        f_x1 = f_x2
+    return x1,it,f_x1
+            
 
 
 def show(x,it,f_x):
@@ -47,7 +54,6 @@ def show(x,it,f_x):
     print(f'число итераций: {it}')
     print(f"невязка: {abs(f_x)}")
     
-
 x = np.linspace(-4,0.5,1000)
 
 plt.figure()
@@ -55,11 +61,11 @@ plt.plot(x,f(x),label='$f(x) = x^3 + 4.7x^2 + 4.1x + 0.5$',color='black')
 plt.grid()
 plt.show()
 
-while 1:
-    a = float(input("Введите левый конец отрезка a: "))
-    b = float(input("Введите правый конец отрезка b: "))
-    choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
+a = float(input("Введите левый конец отрезка a: "))
+b = float(input("Введите правый конец отрезка b: "))
 
+while 1:   
+    choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
     match choice:
         case 1:
             print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
