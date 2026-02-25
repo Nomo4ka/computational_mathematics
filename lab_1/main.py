@@ -50,16 +50,19 @@ plt.show()
 
 a = float(input("Введите левый конец отрезка a: "))
 b = float(input("Введите правый конец отрезка b: "))
+choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
 
-c,it,f_c = methodPolovinnogoDeleniya(a , b)
-c1,it1,f_c1 = methodSecuschih(a , b)
+
+
 
 print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
+c,it,f_c = methodPolovinnogoDeleniya(a , b)
 print(f'корни уравнения по методам: {c}')
 print(f'число итераций: {it}')
 print(f'значения в точке f(c): {f_c}')
 
 print('\nМЕТОД СЕКУЩИХ')
+c1,it1,f_c1 = methodSecuschih(a , b)
 print(f'корни уравнения по методам: {c1}')
 print(f'число итераций: {it1}')
 print(f'значения в точке f(c): {f_c1}')
