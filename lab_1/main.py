@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -46,8 +45,6 @@ def methodSecuschih(x0 , x1):
         f_x0 = f_x1
         f_x1 = f_x2
     return x1,it,f_x1
-            
-
 
 def show(x,it,f_x):
     print(f'корень уравнения: {x}')
