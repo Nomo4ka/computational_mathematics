@@ -29,7 +29,9 @@ def methodPolovinnogoDeleniya(a , b):
     f_c = f(c)
     return c, it, f_c
 
-def methodSecuschih(x0 , x1):
+def methodSecuschih(x0):
+    h = 0.1
+    x1 = x0 + h
     f_x0 = f(x0)
     f_x1 = f(x1)
     it = 0
@@ -60,6 +62,7 @@ plt.show()
 
 a = float(input("Введите левый конец отрезка a: "))
 b = float(input("Введите правый конец отрезка b: "))
+x0 = float(input("Введите начальное приближение: "))
 
 while 1:   
     choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
@@ -70,7 +73,7 @@ while 1:
             show(c,it,f_c)
         case 2:
             print('\nМЕТОД СЕКУЩИХ')
-            c1,it1,f_c1 = methodSecuschih(a , b)
+            c1,it1,f_c1 = methodSecuschih(x0)
             show(c1,it1,f_c1)
             
     c = input('\nПродолжить? Введите Y или y, чтобы подтвердить , иначе - нет: ')
