@@ -5,8 +5,22 @@ import matplotlib.pyplot as plt
 
 EPS =1e-3
 
+class Result:
+    def __init__(self, x, it, f_x):
+        self.x = x  
+        self.it = it  
+        self.f_x = f_x  
+    
+    def display(self):
+        print(f'корень уравнения: {self.x}')
+        print(f'число итераций: {self.it}')
+        print(f"невязка: {abs(self.f_x)}")
+
 def f(x):
     return x**3 + 4.7*x**2 + 4.1*x + 0.5
+
+def df_x(x):
+    return 3*x**2 + 9.4*x + 4.1
 
 def methodPolovinnogoDeleniya(a , b):
     f_a = f(a)
@@ -17,7 +31,7 @@ def methodPolovinnogoDeleniya(a , b):
         it += 1
         
         if abs(f_c) < EPS:
-            return c,it,f_c
+            return Result(c, it, f_c)
         
         if f_a*f_c < 0:
             b = c
@@ -27,14 +41,13 @@ def methodPolovinnogoDeleniya(a , b):
 
     c = 0.5*(a + b)
     f_c = f(c)
-    return c, it, f_c
+    return Result(c, it, f_c)
 
-def methodSecuschih(x0):
-    h = 0.1
-    x1 = x0 + h
+def methodSecuschih(x0 ):
+    x1 = x0 - f(x0)/df_x(x0)
     f_x0 = f(x0)
     f_x1 = f(x1)
-    it = 0
+    it = 1
         
     while abs(x1 - x0) > EPS and abs(f_x1) > EPS:
 
@@ -46,36 +59,40 @@ def methodSecuschih(x0):
         x1 = x2
         f_x0 = f_x1
         f_x1 = f_x2
-    return x1,it,f_x1
+    return Result(x1, it, f_x1)
 
-def show(x,it,f_x):
-    print(f'корень уравнения: {x}')
-    print(f'число итераций: {it}')
-    print(f"невязка: {abs(f_x)}")
+def graphics():
+    x = np.linspace(-4,0.5,1000)
+    plt.figure()
+    plt.plot(x,f(x),label='$f(x) = x^3 + 4.7x^2 + 4.1x + 0.5$',color='black') 
+    plt.grid()
+    plt.show()
+
+def userInput():
+    a = float(input("Левая граница a = "))
+    b = float(input("Правая граница b = "))
+    x0 = float(input("\nВведите начальное приближение: "))
     
-x = np.linspace(-4,0.5,1000)
+    return a, b, x0
+def main():
+    graphics()
+    a , b ,x0 = userInput()
 
-plt.figure()
-plt.plot(x,f(x),label='$f(x) = x^3 + 4.7x^2 + 4.1x + 0.5$',color='black') 
-plt.grid()
-plt.show()
+    while 1:   
+        choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
+        match choice:
+            case 1:
+                print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
+                result = methodPolovinnogoDeleniya(a , b)
+                result.display()
+            case 2:
+                print('\nМЕТОД СЕКУЩИХ')
+                result  = methodSecuschih(x0)
+                result.display()
+                
+        c = input('\nПродолжить? Введите Y или y, чтобы подтвердить , иначе - нет: ')
+        if(c != 'Y' and c != 'y'):
+            break
 
-a = float(input("Введите левый конец отрезка a: "))
-b = float(input("Введите правый конец отрезка b: "))
-x0 = float(input("Введите начальное приближение: "))
-
-while 1:   
-    choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
-    match choice:
-        case 1:
-            print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
-            c,it,f_c = methodPolovinnogoDeleniya(a , b)
-            show(c,it,f_c)
-        case 2:
-            print('\nМЕТОД СЕКУЩИХ')
-            c1,it1,f_c1 = methodSecuschih(x0)
-            show(c1,it1,f_c1)
-            
-    c = input('\nПродолжить? Введите Y или y, чтобы подтвердить , иначе - нет: ')
-    if(c != 'Y' and c != 'y'):
-        break
+if __name__ == "__main__":
+    main()
