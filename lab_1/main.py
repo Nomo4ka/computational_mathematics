@@ -22,7 +22,7 @@ def f(x):
 def df_x(x):
     return 3*x**2 + 9.4*x + 4.1
 
-def methodPolovinnogoDeleniya(a , b):
+def methodPolovinnogoDeleniya(a:float , b:float):
     f_a = f(a)
     it = 0
     while abs(b - a) >=  2 * EPS:
@@ -43,13 +43,13 @@ def methodPolovinnogoDeleniya(a , b):
     f_c = f(c)
     return Result(c, it, f_c)
 
-def methodSecuschih(x0 ):
+def methodSecuschih(x0:float):
     x1 = x0 - f(x0)/df_x(x0)
     f_x0 = f(x0)
     f_x1 = f(x1)
-    it = 1
+    it = 0
         
-    while abs(x1 - x0) > EPS and abs(f_x1) > EPS:
+    while abs(x1 - x0) > EPS:
 
         x2 = x1 - f_x1*(x1 - x0)/(f_x1 - f_x0)
         f_x2 = f(x2)
@@ -74,25 +74,18 @@ def userInput():
     x0 = float(input("\nВведите начальное приближение: "))
     
     return a, b, x0
+
 def main():
     graphics()
     a , b ,x0 = userInput()
 
-    while 1:   
-        choice = int(input("Выберите метод:\n1.Половинного деления \n2.Секущих\n"))
-        match choice:
-            case 1:
-                print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
-                result = methodPolovinnogoDeleniya(a , b)
-                result.display()
-            case 2:
-                print('\nМЕТОД СЕКУЩИХ')
-                result  = methodSecuschih(x0)
-                result.display()
-                
-        c = input('\nПродолжить? Введите Y или y, чтобы подтвердить , иначе - нет: ')
-        if(c != 'Y' and c != 'y'):
-            break
+    print('\nМЕТОД ПОЛОВИННОГО ДЕЛЕНИЯ')
+    result = methodPolovinnogoDeleniya(a , b)
+    result.display()
 
+    print('\nМЕТОД СЕКУЩИХ')
+    result1  = methodSecuschih(x0)
+    result1.display()
+            
 if __name__ == "__main__":
     main()
