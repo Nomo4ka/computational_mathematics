@@ -6,11 +6,11 @@ import sympy as sp
 EPS = 1e-5
 
 class Result:
-    def __init__(self, x, y,it ,f_x):
+    def __init__(self, x, y,it,F_x):
         self.x = x  
         self.y = y
-        self.it = it  
-        self.f_x = f_x  
+        self.it = it 
+        self.F_x = F_x 
     
     def display(self):
         print(f'корень уравнения: {self.x} , {self.y}')
@@ -36,6 +36,22 @@ def Newton_method(X0):
     while np.linalg.norm(Xpp - X) >= EPS:
         X = Xpp
         J = Jacobian(X)
+        X = np.array(X)
+        vall = vecFx(X)
+        Xpp = X - np.dot(np.linalg.inv(J),vall) 
+        it +=1
+
+    return Result(Xpp[0], Xpp[1], it, vecFx(Xpp))
+
+def modNewton_method(X0):
+    J = Jacobian(X0)
+    X = np.array(X0)
+    vall = vecFx(X0)
+    Xpp = X - np.dot(np.linalg.inv(J),vall)
+    it = 0
+    
+    while np.linalg.norm(Xpp - X) >= EPS:
+        X = Xpp
         X = np.array(X)
         vall = vecFx(X)
         Xpp = X - np.dot(np.linalg.inv(J),vall) 
@@ -78,6 +94,14 @@ def graphics():
     
 def main():
     graphics()
+    X = userInp()
+    res1 = Newton_method(X)
+    res2 = modNewton_method(X)
+
+    print("\nМЕТОД НЬЮТОНА\n")   
+    res1.display()
+    print("\nМОДИФИЦИРОВАННЫЙ МЕТОД НЬЮТОНА\n")
+    res2.display()
     
 if __name__ == "__main__":
     main() 
