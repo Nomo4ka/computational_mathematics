@@ -13,26 +13,34 @@ class NewtonInterpolator:
     def __init__(self, xs, ys):
         self.xs = np.array(xs, dtype=float)
         self.ys = np.array(ys, dtype=float)
-        self.dd = self._build_divided_differences()
+        self.h = self.xs[1] - self.xs[0]
+        self.diff_table = self.build_table()
 
-    def _build_divided_differences(self):
-        n = len(self.xs)
-        dd = np.zeros((n, n))
-        dd[:, 0] = self.ys
+    def build_table(self):
+        n = len(self.ys)
+        table = np.zeros((n, n))
+        table[:, 0] = self.ys
 
         for j in range(1, n):
             for i in range(n - j):
-                dd[i, j] = (dd[i + 1, j - 1] - dd[i, j - 1]) / (self.xs[i + j] - self.xs[i])
+                table[i][j] = table[i + 1][j - 1] - table[i][j - 1]
 
-        return dd
+        return table
 
     def value(self, x):
-        s = self.dd[0, 0]
-        p = 1.0
-        for j in range(1, len(self.xs)):
-            p *= (x - self.xs[j - 1])
-            s += self.dd[0, j] * p
-        return s
+        t = (x - self.xs[0]) / self.h
+
+        result = self.diff_table[0][0]
+
+        fact = 1
+        t_term = 1
+
+        for i in range(1, len(self.xs)):
+            t_term *= (t - (i - 1))
+            fact *= i
+            result += (t_term / fact) * self.diff_table[0][i]
+
+        return result
 
 class LagrangeInterpolator:
     def __init__(self, xs, ys):
