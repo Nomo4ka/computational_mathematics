@@ -92,6 +92,70 @@ def build_parabolic_spline(xs, ys):
 
     return a_coef, b_coef, c_coef
 
+def parabolic_spline_value(x, xs, coeffs):
+    a_coef, b_coef, c_coef = coeffs
+    n = len(xs) - 1
+
+    if x <= xs[0]:
+        i = 0
+    elif x >= xs[-1]:
+        i = n - 1
+    else:
+        i = np.searchsorted(xs, x) - 1
+        if i == n:
+            i = n - 1
+
+    dx = x - xs[i]
+    return a_coef[i] + b_coef[i] * dx + c_coef[i] * dx**2
+
+def build_cubic_spline(xs, ys):
+    n = len(xs) - 1
+    h = np.diff(xs)
+
+    A = np.zeros((n + 1, n + 1))
+    rhs = np.zeros(n + 1)
+
+    A[0, 0] = 1
+    A[n, n] = 1
+
+    for i in range(1, n):
+        A[i, i - 1] = h[i - 1]
+        A[i, i] = 2 * (h[i - 1] + h[i])
+        A[i, i + 1] = h[i]
+
+        rhs[i] = 6 * (
+            (ys[i + 1] - ys[i]) / h[i]
+            - (ys[i] - ys[i - 1]) / h[i - 1]
+        )
+
+    M = np.linalg.solve(A, rhs)
+    return M
+
+def cubic_spline_value(x, xs, ys, M):
+    n = len(xs) - 1
+
+    if x <= xs[0]:
+        i = 0
+    elif x >= xs[-1]:
+        i = n - 1
+    else:
+        i = np.searchsorted(xs, x) - 1
+        if i == n:
+            i = n - 1
+
+    h = xs[i + 1] - xs[i]
+
+    xi, xi1 = xs[i], xs[i + 1]
+    yi, yi1 = ys[i], ys[i + 1]
+    Mi, Mi1 = M[i], M[i + 1]
+
+    return (
+        Mi * (xi1 - x)**3 / (6 * h)
+        + Mi1 * (x - xi)**3 / (6 * h)
+        + (yi - Mi * h**2 / 6) * (xi1 - x) / h
+        + (yi1 - Mi1 * h**2 / 6) * (x - xi) / h
+    )
+    
 def main():
     xs, ys = make_table(a, b, h)
     print_table(xs, ys)
@@ -101,26 +165,42 @@ def main():
     y_lag = local_lagrange(x_test, xs, ys)
     y_new = local_newton(x_test, xs, ys)
 
+    parabolic_coeffs = build_parabolic_spline(xs, ys)
+    cubic_M = build_cubic_spline(xs, ys)
+
+    y_par = parabolic_spline_value(x_test, xs, parabolic_coeffs)
+    y_cub = cubic_spline_value(x_test, xs, ys, cubic_M)
+
     print("\nПроверка в точке x =", x_test)
     print(f"f(x)          = {y_true:.10f}")
     print(f"Lagrange(x)   = {y_lag:.10f}")
     print(f"Newton(x)     = {y_new:.10f}")
+    print(f"Parabolic     = {y_par:.10f}")
+    print(f"Cubic spline  = {y_cub:.10f}")
+
     print(f"|f-L|         = {abs(y_true - y_lag):.10e}")
     print(f"|f-N|         = {abs(y_true - y_new):.10e}")
+    print(f"|f-Par|       = {abs(y_true - y_par):.10e}")
+    print(f"|f-Cub|       = {abs(y_true - y_cub):.10e}")
 
     x_plot = np.linspace(a, b, 400)
     y_true_plot = f(x_plot)
+
     y_lag_plot = np.array([local_lagrange(x, xs, ys) for x in x_plot])
     y_new_plot = np.array([local_newton(x, xs, ys) for x in x_plot])
+    y_par_plot = np.array([parabolic_spline_value(x, xs, parabolic_coeffs) for x in x_plot])
+    y_cub_plot = np.array([cubic_spline_value(x, xs, ys, cubic_M) for x in x_plot])
 
     plt.figure(figsize=(10, 6))
     plt.plot(x_plot, y_true_plot, label='f(x)')
     plt.plot(x_plot, y_lag_plot, label='Lagrange')
     plt.plot(x_plot, y_new_plot, label='Newton')
+    plt.plot(x_plot, y_par_plot, label='Parabolic spline')
+    plt.plot(x_plot, y_cub_plot, label='Cubic spline')
     plt.scatter(xs, ys, label='Узлы')
     plt.grid(True)
     plt.legend()
-    plt.title('Интерполяция функции')
+    plt.title('Сравнение интерполяций')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.show()
@@ -128,12 +208,14 @@ def main():
     plt.figure(figsize=(10, 6))
     plt.plot(x_plot, np.abs(y_true_plot - y_lag_plot), label='|f - Lagrange|')
     plt.plot(x_plot, np.abs(y_true_plot - y_new_plot), label='|f - Newton|')
+    plt.plot(x_plot, np.abs(y_true_plot - y_par_plot), label='|f - Parabolic|')
+    plt.plot(x_plot, np.abs(y_true_plot - y_cub_plot), label='|f - Cubic|')
     plt.grid(True)
     plt.legend()
     plt.title('Абсолютные погрешности')
     plt.xlabel('x')
     plt.ylabel('Ошибка')
     plt.show()
-
+    
 if __name__ == "__main__":
     main()

@@ -1,4 +1,8 @@
-arr = [x for x in range(10)]
+import numpy as np
+import matplotlib.pyplot as plt
 
-print(arr)
-print(arr[:1])
+arr = np.array([i for i in range(5)])
+x = np.zeros((5, 5))
+
+x[:,0] = arr
+print(x)
