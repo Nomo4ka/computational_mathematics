@@ -98,28 +98,85 @@ class CubicSpline:
     def __init__(self, xs, ys):
         self.xs = np.array(xs, dtype=float)
         self.ys = np.array(ys, dtype=float)
-        self.M = self.build()
+        self.a, self.b, self.c, self.d = self.build()
+
+    def thomas_method(self, lower, diag, upper, rhs):
+        n = len(diag)
+
+        C = np.zeros(n)
+        D = np.zeros(n)
+
+        C[0] = upper[0] / diag[0]
+        D[0] = rhs[0] / diag[0]
+
+        for i in range(1, n):
+            denom = diag[i] - lower[i] * C[i - 1]
+            if i < n - 1:
+                C[i] = upper[i] / denom
+            D[i] = (rhs[i] - lower[i] * D[i - 1]) / denom
+
+        x = np.zeros(n)
+        x[-1] = D[-1]
+
+        for i in range(n - 2, -1, -1):
+            x[i] = D[i] - C[i] * x[i + 1]
+
+        return x
 
     def build(self):
         n = len(self.xs) - 1
         h = np.diff(self.xs)
 
-        A = np.zeros((n + 1, n + 1))
+        lower = np.zeros(n + 1)
+        diag = np.zeros(n + 1)
+        upper = np.zeros(n + 1)
         rhs = np.zeros(n + 1)
 
-        A[0, 0] = 1.0
-        A[n, n] = 1.0
+        diag[0] = 1.0
+        rhs[0] = 0.0
+
+        diag[n] = 1.0
+        rhs[n] = 0.0
 
         for i in range(1, n):
-            A[i, i - 1] = h[i - 1]
-            A[i, i] = 2 * (h[i - 1] + h[i])
-            A[i, i + 1] = h[i]
-            rhs[i] = 6 * (
+            lower[i] = h[i - 1]
+            diag[i] = 2 * (h[i - 1] + h[i])
+            upper[i] = h[i]
+            rhs[i] = 3 * (
                 (self.ys[i + 1] - self.ys[i]) / h[i]
                 - (self.ys[i] - self.ys[i - 1]) / h[i - 1]
             )
 
-        return np.linalg.solve(A, rhs)
+        c = self.thomas_method(lower, diag, upper, rhs)
+
+        a = np.zeros(n)
+        b = np.zeros(n)
+        d = np.zeros(n)
+
+        for i in range(n):
+            a[i] = self.ys[i]
+            b[i] = (self.ys[i + 1] - self.ys[i]) / h[i] - h[i] * (2 * c[i] + c[i + 1]) / 3
+            d[i] = (c[i + 1] - c[i]) / (3 * h[i])
+
+        return a, b, c, d
+
+    def value(self, x):
+        n = len(self.xs) - 1
+
+        i = np.searchsorted(self.xs, x) - 1
+        if i < 0:
+            i = 0
+        if i >= n:
+            i = n - 1
+
+        dx = x - self.xs[i]
+
+        return (
+            self.a[i]
+            + self.b[i] * dx
+            + self.c[i] * dx ** 2
+            + self.d[i] * dx ** 3
+        )
 
     def value(self, x):
         i = np.searchsorted(self.xs, x) - 1
