@@ -16,12 +16,12 @@ def f4(x):
 a = 1
 b = 3
 eps = 5e-6
-degree = 3
+N = 3
 
 res = minimize_scalar(lambda t: -abs(f4(t)), bounds=(a, b), method="bounded")
 M4 = max(abs(f4(a)), abs(f4(b)), abs(f4(res.x)))
 
-h_est = (factorial(degree + 1) * eps / M4) ** (1 / (degree + 1))
+h_est = (factorial(N + 1) * eps / M4) ** (1 / (N + 1))
 
 print(f"M4 = {M4}")
 print(f"Оценка шага h = {h_est}")
