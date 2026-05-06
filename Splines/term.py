@@ -6,19 +6,6 @@ from math import factorial
 
 x = sp.Symbol('x')
 
-def lagrange_polynomial(xs, ys, func=None, var=x):
-
-    polynomial = 0
-    for i, xi in enumerate(xs):
-        basis = 1
-        for j, xj in enumerate(xs):
-            if i != j:
-                basis *= (var - xj) / (xi - xj)
-        polynomial += ys[i] * basis
-
-    return sp.expand(polynomial)
-
-
 def g(x):
     return x/(10*sp.pi * sp.sin(x))
 
@@ -46,5 +33,5 @@ h = pow(factorial(n + 1) * eps / M,1/4)
 print("h =", h)
 xs = [1, 1 + h, 1 + 2*h, 1 + 3*h]
 ys = [g(xi) for xi in xs]
-P3 = lagrange_polynomial(xs, ys)
+
 print(sp.N(P3, 12))

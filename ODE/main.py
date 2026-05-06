@@ -20,14 +20,14 @@ class Euler:
     def step(self, x, y, h):
         return y + h * self.f(x, y)
 
-    def solve(self, x0, y0, x_end, h):
-        xs = [x0]
+    def solve(self, x0, y0, b, h):
+        xs = [x0]   
         ys = [y0]
 
         x = x0
         y = y0
 
-        while x < x_end:
+        while x < b:
             h_step = min(h, b - x)
             y = self.step(x, y, h_step)
             x += h_step
@@ -49,15 +49,15 @@ class RungeKutta:
 
         return y + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
 
-    def solve(self, x0, y0, x_end, h):
+    def solve(self, x0, y0, b, h):
         xs = [x0]
         ys = [y0]
 
         x = x0
         y = y0
 
-        while x < x_end:
-            h_step = min(h, x_end - x)
+        while x < b:
+            h_step = min(h, b - x)
             y = self.step(x, y, h_step)
             x += h_step
 
