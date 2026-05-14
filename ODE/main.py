@@ -28,9 +28,8 @@ class Euler:
         y = y0
 
         while x < b:
-            h_step = min(h, b - x)
-            y = self.step(x, y, h_step)
-            x += h_step
+            y = self.step(x, y)
+            x += h
 
             xs.append(x)
             ys.append(y)
@@ -57,9 +56,8 @@ class RungeKutta:
         y = y0
 
         while x < b:
-            h_step = min(h, b - x)
-            y = self.step(x, y, h_step)
-            x += h_step
+            y = self.step(x, y)
+            x += h
 
             xs.append(x)
             ys.append(y)
