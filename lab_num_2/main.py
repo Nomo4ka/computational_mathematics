@@ -54,34 +54,60 @@ def Newton(x,xarr,h):
     return res
 
 def coeffscalc(xarr, h):
-    n = 4
+    n = 3
     coeffs = []
     C = 0 
-    B = (f(xarr[1] - f(xarr[0])))/h
+    B = (f(xarr[1]) - f(xarr[0]))/h
     for i in range(n):
         xi = xarr[i]
         xi1 = xarr[i+1]
         A = f(xi)
         if i != 0:
-            C = (f(xi1) - 2*f(xi) + f(xi-1)) / h**2
+            C = (f(xi1) - A - B*h) / h**2
         coeffs.append(ParabCoefficient(A, B, C))
         B = B + 2*C*h
     return coeffs
 
-def Paraspline(x,xarr,paracoeffs):
-    return paracoeffs.A + paracoeffs.B*(x-xarr[0]) + paracoeffs.C*(x-xarr[0])**2
+def Paraspline(x,xarr,coeffs):
+    i = np.searchsorted(xarr, x) - 1
+    if i < 0:
+        i = 0
+    if i >= len(coeffs):
+        i = len(coeffs) - 1
+    c = coeffs[i]
+    dx = x - xarr[i]
+    return c.A + c.B*dx + c.C*dx**2
+
+def cubicCoeffs(xarr, h):
+    n = 3
+    coeffs = []
+    arr = np.zeros((4, 4))
+    arrR = np.zeros(4)
+    arr[0][0] = 1 
+    arr[3][3] = 1
+    for i in range(1,3):
+        arr[i][i - 1] = h
+        arr[i][i] = 4*h
+        arr[i][i+1] = h
+        arrR = 3 * (
+            (f(xarr[i+1]-f(xarr[i])))/h - (f(xarr[i]) - f(xarr[i-1]))/h
+        )
+    C = linal
+    
+def cubicSpline(x,xarr,coeffs):
+    
 
 def graph(xarr, h):
-    Y = [f(x) for x in xarr]
-    Ylag = [Lagrange(x, xarr) for x in xarr]
-    Ynew = [Newton(x, xarr, h) for x in xarr]
+    Xdense = np.linspace(xarr[0], xarr[3], 500)
+    Y = [f(x) for x in Xdense]
+    Ylag = [Lagrange(x, xarr) for x in Xdense]
+    Ynew = [Newton(x, xarr, h) for x in Xdense]
     para = coeffscalc(xarr, h)
-    Ypara = [Paraspline(x, xarr, para[0]) for x in xarr]
-    
-    plt.plot(xarr, Y, label='f(x)')
-    plt.plot(xarr, Ylag, label='Lagrange')
-    plt.plot(xarr, Ynew, label='Newton')
-    plt.plot(xarr, Ypara, label='Parabolic Spline')
+    Ypara = [Paraspline(x, xarr, para) for x in Xdense]
+    plt.plot(Xdense, Y, label='f(x)')
+    plt.plot(Xdense, Ylag, label='Lagrange')
+    plt.plot(Xdense, Ynew, label='Newton')
+    plt.plot(Xdense, Ypara, label='Parabolic Spline')
     plt.legend()
     plt.grid(True)
     plt.show()
